@@ -4,23 +4,17 @@ module.exports = gql`
   scalar JSON
 
   type Query {
-    myCustomBusinessThing: MyCustomBusinnessQueries!
     basket(basketModel: BasketModelInput!): Basket!
     user: User!
     paymentProviders: PaymentProvidersQueries!
     orders: OrderQueries!
-    subscriptions: SubscriptionQueries!
+    subscriptionContracts: SubscriptionContractQueries!
     voucher(code: String!): VoucherResponse!
   }
 
   type VoucherResponse {
     voucher: Voucher
     isValid: Boolean!
-  }
-
-  type MyCustomBusinnessQueries {
-    whatIsThis: String!
-    dynamicRandomInt: Int!
   }
 
   type Basket {
@@ -96,10 +90,6 @@ module.exports = gql`
 
   type PaymentProvidersQueries {
     stripe: PaymentProvider!
-    klarna: PaymentProvider!
-    vipps: PaymentProvider!
-    mollie: PaymentProvider!
-    paypal: PaymentProvider!
     tillit: TillitPaymentProvider!
   }
 
@@ -121,11 +111,11 @@ module.exports = gql`
     delete(id: String!): JSON
   }
 
-  type SubscriptionQueries {
+  type SubscriptionContractQueries {
     getByCustomer(customerIdentifier: String!): JSON
   }
 
-  type SubscriptionMutations {
+  type SubscriptionContractMutations {
     delete(id: String!): JSON
     updatePaymentMethod(id: String!, paymentMethodId: String!): Boolean
     change(id: String!, plan: String!): Boolean
@@ -140,7 +130,7 @@ module.exports = gql`
   type Mutation {
     user: UserMutations
     order: OrderMutations
-    subscription: SubscriptionMutations
+    subscriptionContracts: SubscriptionMutations
     paymentProviders: PaymentProvidersMutations!
   }
 

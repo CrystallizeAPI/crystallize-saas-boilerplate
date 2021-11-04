@@ -5,10 +5,6 @@ const userService = require("../services/user-service");
 const voucherService = require("../services/voucher-service");
 
 const stripeService = require("../services/payment-providers/stripe");
-const mollieService = require("../services/payment-providers/mollie");
-const vippsService = require("../services/payment-providers/vipps");
-const klarnaService = require("../services/payment-providers/klarna");
-const paypalService = require("../services/payment-providers/paypal");
 const tillitService = require("../services/payment-providers/tillit");
 
 function paymentProviderResolver(service) {
@@ -22,30 +18,16 @@ function paymentProviderResolver(service) {
 
 module.exports = {
   Query: {
-    myCustomBusinessThing: () => ({
-      whatIsThis:
-        "This is an example of a custom query for GraphQL demonstration purpuses. Check out the MyCustomBusinnessQueries resolvers for how to resolve additional fields apart from the 'whatIsThis' field",
-    }),
     basket: (parent, args, context) => basketService.get({ ...args, context }),
     user: (parent, args, context) => userService.getUser({ context }),
     orders: () => ({}),
-    subscriptions: () => ({}),
+    subscriptionContracts: () => ({}),
     paymentProviders: () => ({}),
     voucher: (parent, args, context) =>
       voucherService.get({ ...args, context }),
   },
-  MyCustomBusinnessQueries: {
-    dynamicRandomInt() {
-      console.log("dynamicRandomInt called");
-      return parseInt(Math.random() * 100);
-    },
-  },
   PaymentProvidersQueries: {
     stripe: paymentProviderResolver(stripeService),
-    klarna: paymentProviderResolver(klarnaService),
-    vipps: paymentProviderResolver(vippsService),
-    mollie: paymentProviderResolver(mollieService),
-    paypal: paymentProviderResolver(paypalService),
     tillit: () => ({}),
   },
   TillitPaymentProvider: {
@@ -56,14 +38,14 @@ module.exports = {
     getByCustomer: (parent, args) =>
       crystallize.orders.getByCustomer(args.customerIdentifier),
   },
-  SubscriptionQueries: {
+  SubscriptionContractQueries: {
     getByCustomer: (parent, args) =>
-      crystallize.subscriptions.getByCustomer(args.customerIdentifier),
+      crystallize.subscriptionContracts.getByCustomer(args.customerIdentifier),
   },
   Mutation: {
     user: () => ({}),
     order: () => ({}),
-    subscription: () => ({}),
+    subscriptionContracts: () => ({}),
     paymentProviders: () => ({}),
   },
   UserMutations: {
@@ -75,12 +57,12 @@ module.exports = {
   OrderMutations: {
     delete: (parent, args) => crystallize.orders.delete(args.id),
   },
-  SubscriptionMutations: {
-    delete: (parent, args) => crystallize.subscriptions.delete(args.id),
+  SubscriptionContractMutations: {
+    delete: (parent, args) => crystallize.subscriptionContracts.delete(args.id),
     updatePaymentMethod: (parent, args, context) =>
-      crystallize.subscriptions.updatePaymentMethod({ ...args, context }),
+      crystallize.subscriptionContracts.updatePaymentMethod({ ...args, context }),
     change: (parent, args, context) =>
-      crystallize.subscriptions.change({ ...args, context }),
+      crystallize.subscriptionContracts.change({ ...args, context }),
   },
   PaymentProvidersMutations: {
     stripe: () => ({}),

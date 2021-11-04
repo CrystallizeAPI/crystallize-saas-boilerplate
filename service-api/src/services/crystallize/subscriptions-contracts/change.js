@@ -1,6 +1,6 @@
 const { differenceInCalendarDays, subMonths } = require("date-fns");
-const get = require("./get-subscription");
-const update = require("./update-subscription");
+const get = require("./get-subscription-contract");
+const update = require("./update-subscription-contract");
 const create = require("./create-subscription-contract");
 const {
   createRecurringInput,
