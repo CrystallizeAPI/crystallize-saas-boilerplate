@@ -3,12 +3,12 @@ import { FC } from "react";
 import { Box, Spacer, Button, Typography, Flex } from "@/design-system";
 import { CheckIcon } from "@radix-ui/react-icons";
 import { Plan } from "@/types/basket";
+import { ProductPriceVariant } from "@/crystallize/types.generated";
+import { PriceVariant } from "@/components/price-variant";
 
 interface SubscriptionInterface {
   name: string;
-  price: string;
-  type: string;
-  description: string;
+  price: ProductPriceVariant;
   isActive?: boolean;
   plan: Plan;
   onSelect: (plan: Plan) => void;
@@ -17,8 +17,6 @@ interface SubscriptionInterface {
 export const SubscriptionCard: FC<SubscriptionInterface> = ({
   name,
   price,
-  type,
-  description,
   isActive = false,
   plan,
   onSelect,
@@ -85,15 +83,21 @@ export const SubscriptionCard: FC<SubscriptionInterface> = ({
         data-card-price
         data-card-text-active={isActive}
       >
-        {price || type}
-        <Typography
-          variant="heading"
-          size="5"
-          data-card-price
-          data-card-text-active={isActive}
-        >
-          {price ? `/${type}` : ""}
-        </Typography>
+        {!price.price ? (
+          "Free"
+        ) : (
+          <>
+            <PriceVariant {...price} />
+            <Typography
+              variant="heading"
+              size="5"
+              data-card-price
+              data-card-text-active={isActive}
+            >
+              /month
+            </Typography>
+          </>
+        )}
       </Typography>
 
       <Spacer space={5} />
@@ -103,10 +107,13 @@ export const SubscriptionCard: FC<SubscriptionInterface> = ({
         variant="text"
         size="2"
         css={{ lineHeight: "$relaxed" }}
-        dangerouslySetInnerHTML={{ __html: description }}
         data-card-text
         data-card-text-active={isActive}
-      />
+      >
+        TODO: Full access to library.
+        <br /> 50 downloads / month
+        <br />3 users
+      </Typography>
 
       <Spacer space={9} />
 

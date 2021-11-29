@@ -16,7 +16,7 @@ module.exports = async function orderCreated(payload) {
   }
 
   const product = await crystallize.products.getByPath(
-    `/pricing-page/${order.cart[0].sku}`
+    `/plans/${order.cart[0].sku}`
   );
 
   const input = crystallize.subscriptions.utils.createSubscriptionContractInput(

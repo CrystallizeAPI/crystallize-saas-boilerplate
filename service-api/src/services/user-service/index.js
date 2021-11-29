@@ -187,8 +187,10 @@ module.exports = {
   },
   async startSignUp({ firstName, lastName, email }) {
     try {
-      const subscription = await crystallize.subscriptions.getByCustomer(email);
-      if (subscription.edges.length > 0) throw new Error();
+      const subscriptionContract = await crystallize.subscriptionContracts.getByCustomer(
+        email
+      );
+      if (subscriptionContract.edges.length > 0) throw new Error();
       try {
         await crystallize.customers.create({
           identifier: email,

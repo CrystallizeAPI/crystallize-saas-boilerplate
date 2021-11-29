@@ -9,18 +9,11 @@ module.exports = gql`
     paymentProviders: PaymentProvidersQueries!
     orders: OrderQueries!
     subscriptionContracts: SubscriptionContractQueries!
-    voucher(code: String!): VoucherResponse!
-  }
-
-  type VoucherResponse {
-    voucher: Voucher
-    isValid: Boolean!
   }
 
   type Basket {
     cart: [CartItem!]!
     total: Price!
-    voucher: Voucher
   }
 
   type CartItem {
@@ -121,23 +114,16 @@ module.exports = gql`
     change(id: String!, plan: String!): Boolean
   }
 
-  type Voucher {
-    code: String!
-    discountAmount: Int
-    discountPercent: Float
-  }
-
   type Mutation {
     user: UserMutations
     order: OrderMutations
-    subscriptionContracts: SubscriptionMutations
+    subscriptionContracts: SubscriptionContractMutations
     paymentProviders: PaymentProvidersMutations!
   }
 
   input BasketModelInput {
     locale: LocaleInput!
     cart: [SimpleCartItem!]!
-    voucherCode: String
     crystallizeOrderId: String
     klarnaOrderId: String
   }

@@ -92,19 +92,20 @@ module.exports = async function getByCustomer(customerIdentifier) {
     `,
   });
 
-  const subscriptions = response.data.subscriptionContracts.getMany.edges;
+  const subscriptionContracts =
+    response.data.subscriptionContracts.getMany.edges;
 
   const subscriptionsWithPaymentMethod = [];
 
-  for (const { node: subscription } of subscriptions) {
-    switch (subscription.payment?.provider) {
+  for (const { node: subscriptionContract } of subscriptionContracts) {
+    switch (subscriptionContract.payment?.provider) {
       case "stripe": {
         const paymentMethod = await stripe.paymentMethods.retrieve(
-          subscription.payment.paymentMethodId
+          subscriptionContract.payment.paymentMethodId
         );
         subscriptionsWithPaymentMethod.push({
           node: {
-            ...subscription,
+            ...subscriptionContract,
             paymentMethod,
           },
         });
@@ -113,15 +114,15 @@ module.exports = async function getByCustomer(customerIdentifier) {
       case "custom": {
         subscriptionsWithPaymentMethod.push({
           node: {
-            ...subscription,
-            paymentMethod: subscription.payment,
+            ...subscriptionContract,
+            paymentMethod: subscriptionContract.payment,
           },
         });
         break;
       }
       default:
         subscriptionsWithPaymentMethod.push({
-          node: subscription,
+          node: subscriptionContract,
         });
     }
   }

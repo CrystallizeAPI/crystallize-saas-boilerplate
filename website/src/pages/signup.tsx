@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
-import { NextPage } from "next";
+import { GetStaticProps, NextPage } from "next";
 import { useMutation } from "react-query";
 import { Payments } from "@/components/payments";
-import { serviceAPIClient } from "@/clients";
+import { catalogueClient, serviceAPIClient } from "@/clients";
 import {
   StartSignUpDocument,
   StartSignUpMutation,
@@ -24,6 +24,21 @@ import { Plan } from "@/types/basket";
 import { locale } from "@/config/locale";
 // import { productToPlan } from "@/utils/productToPlan";
 import { useOnlyUnauthenticated } from "@/contexts/auth";
+import {
+  AllPlansDocument,
+  AllPlansQuery,
+  AllPlansQueryVariables,
+} from "@/crystallize/queries/allPlans.generated";
+import { normalizeDocumentNode } from "@/crystallize/utils/normalizeDocumentNode";
+import { Product } from "@/crystallize/types.generated";
+
+export const getStaticProps: GetStaticProps<AllPlansQuery> = async () => {
+  const data = await catalogueClient.request<
+    AllPlansQuery,
+    AllPlansQueryVariables
+  >(normalizeDocumentNode(AllPlansDocument));
+  return { props: { ...data } };
+};
 
 function useStartSignUp() {
   const startMutation = useMutation(
@@ -51,7 +66,7 @@ const subscriptions = [
       name: "Starter",
       lineItem: {
         sku: "start",
-        path: "/pricing-page/starter",
+        path: "/plans/starter",
         quantity: 1,
         priceVariantIdentifier: "default",
       },
@@ -69,7 +84,7 @@ const subscriptions = [
       name: "Team",
       lineItem: {
         sku: "team",
-        path: "/pricing-page/team",
+        path: "/plans/team",
         quantity: 1,
         priceVariantIdentifier: "default",
       },
@@ -87,7 +102,7 @@ const subscriptions = [
       name: "Agency",
       lineItem: {
         sku: "agency",
-        path: "/pricing-page/agency",
+        path: "/plans/agency",
         quantity: 1,
         priceVariantIdentifier: "default",
       },
@@ -95,13 +110,56 @@ const subscriptions = [
   },
 ];
 
-interface SignupPageProps {}
+function getSubscriptionPlans(props: AllPlansQuery) {
+  return props.catalogue?.children
+    .filter((c) => c.__typename === "Product")
+    .map((child) => {
+      const product = child as Product;
+      const [variant] = product?.variants;
+      const variantPlans = variant.subscriptionPlans;
+      if (variantPlans) {
+        const digitalAccessPlan = variantPlans.find(
+          (p) => p.identifier === "digital-access"
+        );
 
-export const SignupPage: NextPage<SignupPageProps> = () => {
+        if (digitalAccessPlan) {
+          const monthlyPeriod = digitalAccessPlan.periods.find(
+            (p) => p.name === "Month"
+          );
+          if (monthlyPeriod) {
+            const selectedPriceVariant =
+              monthlyPeriod.recurring.priceVariants?.find(
+                (p) => p.identifier === "default"
+              );
+            return {
+              name: variant.name,
+              price: selectedPriceVariant,
+              plan: {
+                value: variant.sku,
+                name: variant.name,
+                lineItem: {
+                  sku: variant.sku,
+                  path: product.path,
+                  quantity: 1,
+                  priceVariantIdentifier: "default",
+                },
+              },
+            };
+          }
+        }
+      }
+
+      return null;
+    })
+    .filter(Boolean);
+}
+
+export const SignupPage: NextPage<AllPlansQuery> = (props) => {
   useOnlyUnauthenticated();
+  const subscriptionPlans = getSubscriptionPlans(props);
+  console.log(subscriptionPlans);
 
   const [step, setStep] = useState<"signUp" | "checkout" | "success">("signUp");
-
   const [plan, setPlan] = useState<Plan>(subscriptions[2].plan);
   const [email, setEmail] = useState("");
   const [firstName, setFirstName] = useState("");
@@ -164,12 +222,12 @@ export const SignupPage: NextPage<SignupPageProps> = () => {
               },
             }}
           >
-            {subscriptions.map((subscription, index) => {
+            {subscriptionPlans.map((subscriptionPlan, index) => {
               return (
                 <SubscriptionCard
                   key={index}
-                  {...subscription}
-                  isActive={plan?.name === subscription.plan.name}
+                  {...subscriptionPlan}
+                  isActive={plan?.name === subscriptionPlan.name}
                   onSelect={(plan) => setPlan(plan)}
                 />
               );
