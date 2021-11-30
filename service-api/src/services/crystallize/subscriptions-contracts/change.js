@@ -73,7 +73,7 @@ async function upgrade({ subscriptionContract, product, customerIdentifier }) {
   await orders.create(orderInput);
 
   // Update subscription
-  const input = createSubscriptionContractInput({
+  const input = await createSubscriptionContractInput({
     customerIdentifier,
     product,
     paymentInput: paymentToPaymentInput(subscriptionContract.payment),
@@ -109,7 +109,7 @@ async function downgrade({
       ...createStatusInput(recurringInput),
       activeUntil: null,
     };
-    const input = createSubscriptionContractInput({
+    const input = await createSubscriptionContractInput({
       customerIdentifier,
       product,
       paymentInput: paymentToPaymentInput(subscriptionContract.payment),

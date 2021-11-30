@@ -7,8 +7,6 @@ module.exports = async function orderCreated(payload) {
 
   const order = await crystallize.orders.get(payload.id);
 
-  // console.log(JSON.stringify(order, null, 2));
-
   await emailService.sendOrderConfirmation(order);
 
   if (order.meta?.find((p) => p.key === "isFirstOrder")?.value !== "1") {
@@ -19,7 +17,7 @@ module.exports = async function orderCreated(payload) {
     `/plans/${order.cart[0].sku}`
   );
 
-  const input = crystallize.subscriptions.utils.createSubscriptionContractInput(
+  const input = await crystallize.subscriptions.utils.createSubscriptionContractInput(
     {
       customerIdentifier: order.customer.addresses[0].email,
       product,

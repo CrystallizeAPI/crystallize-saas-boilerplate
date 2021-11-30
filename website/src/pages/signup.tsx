@@ -53,63 +53,6 @@ function useStartSignUp() {
   return startMutation;
 }
 
-const subscriptions = [
-  {
-    name: "Starter",
-    price: "",
-    type: "Free",
-    description:
-      "Full access to library.<br /> 5 downloads / month<br />1 user",
-    isPlanned: false,
-    plan: {
-      value: "starter",
-      name: "Starter",
-      lineItem: {
-        sku: "start",
-        path: "/plans/starter",
-        quantity: 1,
-        priceVariantIdentifier: "default",
-      },
-    },
-  },
-  {
-    name: "Team",
-    price: "$20",
-    type: "month",
-    description:
-      "Full access to library.<br /> 50 downloads / month<br />3 users",
-    isPlanned: false,
-    plan: {
-      value: "team",
-      name: "Team",
-      lineItem: {
-        sku: "team",
-        path: "/plans/team",
-        quantity: 1,
-        priceVariantIdentifier: "default",
-      },
-    },
-  },
-  {
-    name: "Agency",
-    price: "$60",
-    type: "month",
-    description:
-      "Full access to library.<br />100 downloads / month<br />unlimited",
-    isPlanned: false,
-    plan: {
-      value: "agency",
-      name: "Agency",
-      lineItem: {
-        sku: "agency",
-        path: "/plans/agency",
-        quantity: 1,
-        priceVariantIdentifier: "default",
-      },
-    },
-  },
-];
-
 function getSubscriptionPlans(props: AllPlansQuery) {
   return props.catalogue?.children
     .filter((c) => c.__typename === "Product")
@@ -166,7 +109,6 @@ function getSubscriptionPlans(props: AllPlansQuery) {
 export const SignupPage: NextPage<AllPlansQuery> = (props) => {
   useOnlyUnauthenticated();
   const subscriptionPlans = getSubscriptionPlans(props);
-  console.log(subscriptionPlans);
 
   const [step, setStep] = useState<"signUp" | "checkout" | "success">("signUp");
   const [plan, setPlan] = useState<Plan>(subscriptionPlans[2].plan);
@@ -175,10 +117,6 @@ export const SignupPage: NextPage<AllPlansQuery> = (props) => {
   const [lastName, setLastName] = useState("");
 
   const startSignUp = useStartSignUp();
-
-  // const [email, setEmail] = useState("lhtanh98@gmail.com");
-  // const [firstName, setFirstName] = useState("Alex");
-  // const [lastName, setLastName] = useState("Luong");
 
   function getURL(path: string) {
     if (typeof window === "undefined") return "";
@@ -193,7 +131,9 @@ export const SignupPage: NextPage<AllPlansQuery> = (props) => {
     termsURL: getURL(`/terms`),
   };
 
-  function signUp() {
+  function onSignup(event) {
+    event.preventDefault();
+
     startSignUp.mutate({ email, firstName, lastName });
   }
 
@@ -246,57 +186,59 @@ export const SignupPage: NextPage<AllPlansQuery> = (props) => {
 
           <Spacer space={12} />
 
-          <Flex direction="row" css={{ width: "$full" }}>
+          <Box css={{ width: "$full" }} as="form" onSubmit={onSignup}>
+            <Flex direction="row" css={{ width: "$full" }}>
+              <TextField
+                placeholder="First Name"
+                cssForWrapper={{ flex: 1 }}
+                value={firstName}
+                onChange={(e) => setFirstName(e.currentTarget.value)}
+              />
+
+              <Spacer direction="horizontal" space={5} />
+
+              <TextField
+                placeholder="Last Name"
+                cssForWrapper={{ flex: 1 }}
+                value={lastName}
+                onChange={(e) => setLastName(e.currentTarget.value)}
+              />
+            </Flex>
+
+            <Spacer space={5} />
+
             <TextField
-              placeholder="First Name"
-              cssForWrapper={{ flex: 1 }}
-              value={firstName}
-              onChange={(e) => setFirstName(e.currentTarget.value)}
+              placeholder="Email"
+              cssForWrapper={{ width: "$full" }}
+              value={email}
+              onChange={(e) => setEmail(e.currentTarget.value)}
             />
 
-            <Spacer direction="horizontal" space={5} />
+            <Spacer space={5} />
 
-            <TextField
-              placeholder="Last Name"
-              cssForWrapper={{ flex: 1 }}
-              value={lastName}
-              onChange={(e) => setLastName(e.currentTarget.value)}
-            />
-          </Flex>
+            {startSignUp.isError ? (
+              <>
+                <Typography
+                  css={{
+                    width: "$full",
+                    textAlign: "left",
+                    color: "$error",
+                  }}
+                >
+                  {(startSignUp.error as Error)?.message}
+                </Typography>
+                <Spacer space={5} />
+              </>
+            ) : null}
 
-          <Spacer space={5} />
-
-          <TextField
-            placeholder="Email"
-            cssForWrapper={{ width: "$full" }}
-            value={email}
-            onChange={(e) => setEmail(e.currentTarget.value)}
-          />
-
-          <Spacer space={5} />
-
-          {startSignUp.isError ? (
-            <>
-              <Typography
-                css={{
-                  width: "$full",
-                  textAlign: "left",
-                  color: "$error",
-                }}
-              >
-                {(startSignUp.error as Error)?.message}
-              </Typography>
-              <Spacer space={5} />
-            </>
-          ) : null}
-
-          <Button
-            css={{ width: "$full" }}
-            onClick={signUp}
-            disabled={startSignUp.isLoading}
-          >
-            {startSignUp.isLoading ? "Signing Up" : "Sign Up"}
-          </Button>
+            <Button
+              css={{ width: "$full" }}
+              type="submit"
+              disabled={startSignUp.isLoading}
+            >
+              {startSignUp.isLoading ? "Signing Up" : "Sign Up"}
+            </Button>
+          </Box>
 
           <Spacer space={8} />
 
@@ -329,15 +271,3 @@ export const SignupPage: NextPage<AllPlansQuery> = (props) => {
 };
 
 export default SignupPage;
-
-// const plans = useQuery("allPlans", () => catalogueClient.request<AllPlansQuery>(AllPlansDocument));
-
-// useEffect(() => {
-//   if (!plan && plans.data) {
-//     setPlan(productToPlan(plans.data.catalogue.children[0]));
-//   }
-// }, [plans.data]);
-
-// if (!plans?.data) {
-//   return null;
-// }

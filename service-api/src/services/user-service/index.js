@@ -190,6 +190,7 @@ module.exports = {
       const subscriptionContract = await crystallize.subscriptionContracts.getByCustomer(
         email
       );
+
       if (subscriptionContract.edges.length > 0) throw new Error();
       try {
         await crystallize.customers.create({

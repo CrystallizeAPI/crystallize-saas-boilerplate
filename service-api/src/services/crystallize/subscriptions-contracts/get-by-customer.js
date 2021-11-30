@@ -1,4 +1,4 @@
-const { callSubscriptionsApi } = require("../utils");
+const { callSubscriptionsApi, getTenantId } = require("../utils");
 const { getClient } = require("../../payment-providers/stripe/utils");
 
 module.exports = async function getByCustomer(customerIdentifier) {
@@ -6,7 +6,7 @@ module.exports = async function getByCustomer(customerIdentifier) {
 
   const response = await callSubscriptionsApi({
     variables: {
-      tenantId: process.env.CRYSTALLIZE_TENANT_ID,
+      tenantId: await getTenantId(),
       customerIdentifier: customerIdentifier,
     },
     query: `
