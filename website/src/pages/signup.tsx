@@ -131,9 +131,18 @@ function getSubscriptionPlans(props: AllPlansQuery) {
               monthlyPeriod.recurring.priceVariants?.find(
                 (p) => p.identifier === "default"
               );
+
+            const meteredVariables =
+              monthlyPeriod.recurring?.meteredVariables || [];
             return {
               name: variant.name,
               price: selectedPriceVariant,
+              downloadsPrMonth: meteredVariables.find(
+                (m) => m.identifier === "download"
+              )?.tiers[1]?.threshold,
+              usersPrMonth: meteredVariables.find(
+                (m) => m.identifier === "user"
+              )?.tiers[1]?.threshold,
               plan: {
                 value: variant.sku,
                 name: variant.name,
@@ -160,7 +169,7 @@ export const SignupPage: NextPage<AllPlansQuery> = (props) => {
   console.log(subscriptionPlans);
 
   const [step, setStep] = useState<"signUp" | "checkout" | "success">("signUp");
-  const [plan, setPlan] = useState<Plan>(subscriptions[2].plan);
+  const [plan, setPlan] = useState<Plan>(subscriptionPlans[2].plan);
   const [email, setEmail] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -203,8 +212,9 @@ export const SignupPage: NextPage<AllPlansQuery> = (props) => {
       </Typography>
       <Spacer space={10} />
       <Typography as="p" size="4">
-        Nulla non risus vulputate, tristique nisi ut, viverra massa. Vestibulum
-        ante ipsum primis in faucibus orci luctus et ultrices.
+        Choose a plan that suits you. All the plans include full access to the
+        library, and only differs in the amount of downloads and users pr.
+        month.
       </Typography>
       <Spacer space={10} />
 

@@ -10,6 +10,8 @@ interface SubscriptionInterface {
   name: string;
   price: ProductPriceVariant;
   isActive?: boolean;
+  downloadsPrMonth: number;
+  usersPrMonth: number;
   plan: Plan;
   onSelect: (plan: Plan) => void;
 }
@@ -19,10 +21,14 @@ export const SubscriptionCard: FC<SubscriptionInterface> = ({
   price,
   isActive = false,
   plan,
+  downloadsPrMonth,
+  usersPrMonth,
   onSelect,
 }) => {
   return (
     <Box
+      as="label"
+      htmlFor={`plan-${plan.value}`}
       css={{
         display: "flex",
         flexDirection: "column",
@@ -32,6 +38,7 @@ export const SubscriptionCard: FC<SubscriptionInterface> = ({
         borderRadius: "$3xl",
         p: "$3",
         backgroundColor: isActive ? "$primary" : "initial",
+        cursor: "pointer",
 
         "& [data-card-text]": {
           opacity: 0.7,
@@ -46,8 +53,26 @@ export const SubscriptionCard: FC<SubscriptionInterface> = ({
           opacity: 1,
           color: "$white",
         },
+
+        "& [data-input]": {
+          opacity: 0,
+          height: 0,
+          width: 0,
+        },
       }}
     >
+      <input
+        type="checkbox"
+        checked={isActive}
+        tabIndex={-1}
+        onChange={(e) => {
+          if (e.target.checked) {
+            onSelect(plan);
+          }
+        }}
+        data-input
+        id={`plan-${plan.value}`}
+      />
       <Flex justify="start" css={{ width: "$full" }}>
         <Box
           css={{
@@ -110,15 +135,20 @@ export const SubscriptionCard: FC<SubscriptionInterface> = ({
         data-card-text
         data-card-text-active={isActive}
       >
-        TODO: Full access to library.
-        <br /> 50 downloads / month
-        <br />3 users
+        Full access to library.
+        <br />
+        {downloadsPrMonth} downloads / month
+        <br />
+        {!usersPrMonth
+          ? "unlimited"
+          : `${usersPrMonth} user${usersPrMonth === 1 ? "" : "s"}`}
       </Typography>
 
       <Spacer space={9} />
 
       <Button
         variant="primary"
+        type="button"
         on={isActive ? "primary" : "default"}
         disabled={isActive}
         css={{ width: "$full", ...(isActive ? { color: "$black" } : {}) }}
