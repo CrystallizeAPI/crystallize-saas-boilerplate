@@ -73,6 +73,7 @@ module.exports = gql`
   type User {
     logoutLink: String!
     isLoggedIn: Boolean!
+    hasActiveSubscriptionContract: Boolean!
     email: String
     firstName: String
     middleName: String

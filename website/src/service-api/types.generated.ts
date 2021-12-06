@@ -401,6 +401,7 @@ export type User = {
   __typename?: 'User';
   logoutLink: Scalars['String'];
   isLoggedIn: Scalars['Boolean'];
+  hasActiveSubscriptionContract: Scalars['Boolean'];
   email?: Maybe<Scalars['String']>;
   firstName?: Maybe<Scalars['String']>;
   middleName?: Maybe<Scalars['String']>;

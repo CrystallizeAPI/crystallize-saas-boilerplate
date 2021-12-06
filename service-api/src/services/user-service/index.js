@@ -20,6 +20,7 @@ async function getUser({ context }) {
     isLoggedIn: Boolean(userInContext && "email" in userInContext),
     email: userInContext && userInContext.email,
     logoutLink: `${context.publicHost}/user/logout`,
+    hasActiveSubscriptionContract: false,
   };
 
   if (user && user.isLoggedIn) {

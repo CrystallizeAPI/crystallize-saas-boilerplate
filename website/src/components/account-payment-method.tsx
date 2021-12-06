@@ -186,7 +186,7 @@ const StripePaymentMethod = ({
 };
 
 const PaymentMethod = (props: AccountPaymentMethodProps) => {
-  switch (props.paymentMethod.provider) {
+  switch (props.subscriptionContract.payment.provider) {
     case "stripe":
       return <StripePaymentMethod {...props} />;
     case "custom":

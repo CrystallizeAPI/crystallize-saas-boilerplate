@@ -16,7 +16,6 @@ module.exports = async function getByCustomer(customerIdentifier) {
             edges {
               node {
                 id
-
                 subscriptionPlan {
                   tenantId
                   identifier
