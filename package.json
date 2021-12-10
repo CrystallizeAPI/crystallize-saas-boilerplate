@@ -1,0 +1,46 @@
+{
+  "name": "crystallize-saas-boilerplate",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "dev": "turbo run dev --parallel --no-cache",
+    "build": "turbo run build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CrystallizeAPI/crystallize-saas-boilerplate.git"
+  },
+  "keywords": [],
+  "author": "Håkon Krogh<hakon@crystallize.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/CrystallizeAPI/crystallize-saas-boilerplate/issues"
+  },
+  "homepage": "https://github.com/CrystallizeAPI/crystallize-saas-boilerplate#readme",
+  "workspaces": [
+    "service-api",
+    "website"
+  ],
+  "turbo": {
+    "baseBranch": "origin/main",
+    "pipeline": {
+      "build": {
+        "dependsOn": [
+          "^build"
+        ],
+        "outputs": [
+          ".next/**"
+        ]
+      },
+      "lint": {
+        "outputs": []
+      },
+      "dev": {
+        "cache": false
+      }
+    }
+  },
+  "devDependencies": {
+    "turbo": "^1.0.4"
+  }
+}
